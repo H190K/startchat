@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Chat Starter">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="icon.png" type="image/png">
+
+    <title>Chat Starter</title>
+    <style>
+        :root {
+            --bg-color: #0c0c0c;
+            --text-color: #ffffff;
+            --input-bg-color: #1a1a1a;
+            --button-bg-color: #0a84ff;
+            --button-hover-bg-color: #0066cc;
+            --border-radius: 12px;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+        }
+
+        body.light-theme {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --input-bg-color: #f0f0f0;
+            --button-bg-color: #007bff;
+            --button-hover-bg-color: #0056b3;
+        }
+
+        .container {
+            text-align: center;
+            background: var(--input-bg-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group span {
+            font-size: 20px;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            color: var(--text-color);
+            background-color: var(--input-bg-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        #countryCode {
+            width: 15%;
+            max-width: 70px;
+            text-align: center;
+        }
+
+        #phoneNumber {
+            flex: 1;
+        }
+
+        button {
+            background-color: var(--button-bg-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--button-bg-color);
+            text-decoration: none;
+        }
+
+        /* Popup styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background-color: var(--input-bg-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .popup button {
+            margin-top: 20px;
+            background-color: #ff4d4d;
+        }
+
+        .popup img {
+            width: 80px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .popup .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .popup .close-button img {
+            width: 30px;
+        }
+
+        /* Fix for making icons clickable only */
+        .popup a {
+            display: inline-block;
+        }
+
+        .popup a img {
+            pointer-events: auto;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Start Chat</h1>
+        <div class="input-group">
+            <span>+</span>
+            <input type="text" id="countryCode" placeholder="Code" maxlength="4" />
+            <input type="tel" id="phoneNumber" placeholder="Enter phone number" />
+        </div>
+        <button onclick="startChat()">Start Chat</button>
+
+        <footer>
+            <p>Created by <a href="https://twitter.com/h190k" target="_blank">H190K</a></p>
+            <p>Need help? <a href="mailto:info@h190k.com">Contact Us</a></p>
+        </footer>
+    </div>
+
+    <!-- Popup for chat options -->
+    <div class="popup" id="chatPopup">
+        <div class="popup-content">
+            <div class="close-button" onclick="closePopup()">
+                <img src="https://cdn-icons-png.flaticon.com/512/9068/9068699.png" alt="Close">
+            </div>
+            <h2>Chat will start with:</h2>
+            <p id="formattedPhoneNumber"></p>
+            <div>
+                <a href="#" id="whatsappLink" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+                </a>
+                <a href="#" id="telegramLink" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <img src="day-and-night.png" alt="Theme Toggle" class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+
+    <script>
+        function startChat() {
+            const countryCode = document.getElementById('countryCode').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+            if (countryCode && phoneNumber) {
+                const formattedPhoneNumber = `+${countryCode}${phoneNumber.replace(/\D/g, '')}`;
+                document.getElementById('formattedPhoneNumber').textContent = formattedPhoneNumber;
+
+                const whatsappUrl = `https://wa.me/${formattedPhoneNumber}`;
+                const telegramUrl = `https://t.me/+${formattedPhoneNumber}`;
+
+                document.getElementById('whatsappLink').href = whatsappUrl;
+                document.getElementById('telegramLink').href = telegramUrl;
+
+                // Show the popup
+                document.getElementById('chatPopup').style.display = 'flex';
+            } else {
+                alert('Please enter both country code and phone number.');
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('chatPopup').style.display = 'none';
+
+            // Refresh the page to start fresh
+            location.reload();
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggleIcon = document.getElementById('themeToggle');
+
+            // Toggle theme
+            body.classList.toggle('light-theme');
+        }
+    </script>
+</body>
+</html>
