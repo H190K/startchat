@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Chat Starter">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" href="icon.png" type="image/png">
+    <meta name="description" content="Start chats on WhatsApp or Telegram easily">
+    <meta name="theme-color" content="#0c0c0c">
 
     <title>Chat Starter</title>
     <style>
@@ -18,6 +20,9 @@
             --button-bg-color: #0a84ff;
             --button-hover-bg-color: #0066cc;
             --border-radius: 12px;
+            --transition-speed: 0.3s;
+            --error-color: #ff4d4d;
+            --success-color: #28a745;
         }
 
         body {
@@ -29,8 +34,10 @@
             min-height: 100vh;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-            overscroll-behavior: none; /* Prevent pull-to-refresh */
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            overscroll-behavior: none;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         body.light-theme {
@@ -44,42 +51,57 @@
         .container {
             text-align: center;
             background: var(--input-bg-color);
-            padding: 20px;
+            padding: 30px;
             border-radius: var(--border-radius);
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             width: 90%;
             max-width: 400px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            font-size: 22px;
-            margin-bottom: 20px;
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
         .input-group {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .input-group span {
             font-size: 20px;
+            font-weight: 500;
         }
 
         .input-group input {
-            padding: 10px;
-            border: none;
+            padding: 12px;
+            border: 2px solid transparent;
             border-radius: var(--border-radius);
             font-size: 16px;
             color: var(--text-color);
-            background-color: var(--input-bg-color);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            background-color: var(--bg-color);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--button-bg-color);
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
         }
 
         #countryCode {
-            width: 15%;
-            max-width: 70px;
+            width: 70px;
             text-align: center;
         }
 
@@ -91,29 +113,42 @@
             background-color: var(--button-bg-color);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
+            font-weight: 500;
             border-radius: var(--border-radius);
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s;
+            transition: all var(--transition-speed);
         }
 
         button:hover {
             background-color: var(--button-hover-bg-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         footer {
-            margin-top: 20px;
+            margin-top: 25px;
             font-size: 14px;
+            opacity: 0.8;
         }
 
         footer a {
             color: var(--button-bg-color);
             text-decoration: none;
+            transition: color var(--transition-speed);
         }
 
-        /* Popup styles */
+        footer a:hover {
+            color: var(--button-hover-bg-color);
+            text-decoration: underline;
+        }
+
         .popup {
             display: none;
             position: fixed;
@@ -121,61 +156,106 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7);
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+            z-index: 1000;
         }
 
         .popup-content {
             background-color: var(--input-bg-color);
-            padding: 30px;
+            padding: 35px;
             border-radius: var(--border-radius);
             text-align: center;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
             position: relative;
-            width: 80%;
+            width: 85%;
             max-width: 500px;
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .popup button {
             margin-top: 20px;
-            background-color: #ff4d4d;
+            background-color: var(--error-color);
         }
 
         .popup img {
-            width: 80px;
-            margin: 10px;
+            width: 60px;
+            margin: 15px;
             cursor: pointer;
+            transition: transform var(--transition-speed);
+        }
+
+        .popup img:hover {
+            transform: scale(1.1);
         }
 
         .popup .close-button {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             cursor: pointer;
+            opacity: 0.7;
+            transition: opacity var(--transition-speed);
+        }
+
+        .popup .close-button:hover {
+            opacity: 1;
         }
 
         .popup .close-button img {
-            width: 30px;
+            width: 24px;
+            margin: 0;
         }
 
-        /* Fix for making icons clickable only */
-        .popup a {
-            display: inline-block;
-        }
-
-        .popup a img {
-            pointer-events: auto;
-        }
-
-        /* Theme toggle button */
         .theme-toggle {
             position: fixed;
             top: 20px;
             right: 20px;
             cursor: pointer;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
+            padding: 8px;
+            background-color: var(--input-bg-color);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .popup-content {
+                padding: 25px;
+            }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -184,18 +264,18 @@
         <h1>Start Chat</h1>
         <div class="input-group">
             <span>+</span>
-            <input type="text" id="countryCode" placeholder="Code" maxlength="4" />
-            <input type="tel" id="phoneNumber" placeholder="Enter phone number" />
+            <input type="text" id="countryCode" placeholder="Code" maxlength="4" pattern="\d*" inputmode="numeric" />
+            <input type="tel" id="phoneNumber" placeholder="Enter phone number" inputmode="tel" />
         </div>
+        <div class="error" id="errorMessage"></div>
         <button onclick="startChat()">Start Chat</button>
 
         <footer>
-            <p>Created by <a href="https://twitter.com/h190k" target="_blank">H190K</a></p>
+            <p>Created by <a href="https://twitter.com/h190k" target="_blank" rel="noopener noreferrer">H190K</a></p>
             <p>Need help? <a href="mailto:info@h190k.com">Contact Us</a></p>
         </footer>
     </div>
 
-    <!-- Popup for chat options -->
     <div class="popup" id="chatPopup">
         <div class="popup-content">
             <div class="close-button" onclick="closePopup()">
@@ -204,55 +284,99 @@
             <h2>Chat will start with:</h2>
             <p id="formattedPhoneNumber"></p>
             <div>
-                <a href="#" id="whatsappLink" target="_blank">
+                <a href="#" id="whatsappLink" target="_blank" rel="noopener noreferrer">
                     <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
                 </a>
-                <a href="#" id="telegramLink" target="_blank">
+                <a href="#" id="telegramLink" target="_blank" rel="noopener noreferrer">
                     <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Theme Toggle Button -->
     <img src="day-and-night.png" alt="Theme Toggle" class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
 
     <script>
+        // Input validation and formatting
+        document.getElementById('countryCode').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        document.getElementById('phoneNumber').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+
         function startChat() {
             const countryCode = document.getElementById('countryCode').value.trim();
             const phoneNumber = document.getElementById('phoneNumber').value.trim();
 
-            if (countryCode && phoneNumber) {
-                const formattedPhoneNumber = `+${countryCode}${phoneNumber.replace(/\D/g, '')}`;
-                document.getElementById('formattedPhoneNumber').textContent = formattedPhoneNumber;
-
-                const whatsappUrl = `https://wa.me/${formattedPhoneNumber}`;
-                const telegramUrl = `https://t.me/+${formattedPhoneNumber}`;
-
-                document.getElementById('whatsappLink').href = whatsappUrl;
-                document.getElementById('telegramLink').href = telegramUrl;
-
-                // Show the popup
-                document.getElementById('chatPopup').style.display = 'flex';
-            } else {
-                alert('Please enter both country code and phone number.');
+            if (!countryCode || !phoneNumber) {
+                showError('Please enter both country code and phone number.');
+                return;
             }
+
+            if (phoneNumber.length < 5) {
+                showError('Please enter a valid phone number.');
+                return;
+            }
+
+            const formattedPhoneNumber = `+${countryCode}${phoneNumber}`;
+            document.getElementById('formattedPhoneNumber').textContent = formattedPhoneNumber;
+
+            const whatsappUrl = `https://wa.me/${countryCode}${phoneNumber}`;
+            const telegramUrl = `https://t.me/+${countryCode}${phoneNumber}`;
+
+            document.getElementById('whatsappLink').href = whatsappUrl;
+            document.getElementById('telegramLink').href = telegramUrl;
+
+            document.getElementById('chatPopup').style.display = 'flex';
         }
 
         function closePopup() {
-            document.getElementById('chatPopup').style.display = 'none';
-
-            // Refresh the page to start fresh
-            location.reload();
+            const popup = document.getElementById('chatPopup');
+            popup.style.opacity = '0';
+            popup.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                popup.style.display = 'none';
+                popup.style.opacity = '1';
+                popup.style.transform = 'scale(1)';
+                document.getElementById('countryCode').value = '';
+                document.getElementById('phoneNumber').value = '';
+            }, 300);
         }
 
         function toggleTheme() {
             const body = document.body;
-            const themeToggleIcon = document.getElementById('themeToggle');
-
-            // Toggle theme
             body.classList.toggle('light-theme');
+            
+            // Update theme color meta tag
+            const metaThemeColor = document.querySelector('meta[name=theme-color]');
+            metaThemeColor.content = body.classList.contains('light-theme') ? '#ffffff' : '#0c0c0c';
         }
+
+        // Handle escape key to close popup
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('chatPopup').style.display === 'flex') {
+                closePopup();
+            }
+        });
+
+        // Close popup when clicking outside
+        document.getElementById('chatPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
     </script>
 </body>
 </html>
